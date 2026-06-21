@@ -17,6 +17,16 @@ export const products = {
   bySlug: (slug: string) => api.get(`/products/slug/${slug}`).then(r => r.data),
 };
 
+// Categories
+export const categories = {
+  list: () => api.get('/categories').then(r => r.data),
+};
+
+// Banners
+export const banners = {
+  list: () => api.get('/banners').then(r => r.data),
+};
+
 // Cart
 export const cart = {
   get: () => api.get('/cart').then(r => r.data),

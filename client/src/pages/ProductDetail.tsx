@@ -34,10 +34,13 @@ export default function ProductDetail() {
   console.log('ProductDetail - API Response:', data);
 
   // Handle different response shapes: raw object, { data: {...} }, { success: true, data: {...} }
-  const product = data && typeof data === 'object' && !Array.isArray(data)
-    ? (data as any)?.data || data
+  const responseData = data as any;
+  const product = responseData && typeof responseData === 'object' && !Array.isArray(responseData)
+    ? responseData.data || responseData
     : null;
-  const err = (data as any)?.error || (data as any)?.message || null;
+  const err = responseData && typeof responseData === 'object' && responseData.success === false
+    ? responseData.message || responseData.error || 'Unable to load product'
+    : null;
 
   const handleAddToCart = () => {
     if (product && product.stock > 0) {

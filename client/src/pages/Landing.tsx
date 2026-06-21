@@ -158,7 +158,7 @@ export default function Landing() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Link to={`/products?category=${category.slug}`}>
+                  <Link to={`/products?category=${category._id}`}>
                     <Card className="group h-full hover:shadow-medium transition-all duration-300 cursor-pointer overflow-hidden">
                       <div className="p-6 flex flex-col items-center text-center h-full">
                         <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-accent-100 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">

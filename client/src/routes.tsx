@@ -3,6 +3,8 @@ import MainLayout from './layouts/MainLayout';
 import Landing from './pages/Landing';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
+import Categories from './pages/Categories';
+import Deals from './pages/Deals';
 import SearchResults from './pages/SearchResults';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -23,6 +25,8 @@ export default function AppRoutes() {
         <Route index element={<Landing />} />
         <Route path="products" element={<ProductList />} />
         <Route path="products/:id" element={<ProductDetail />} />
+        <Route path="categories" element={<Categories />} />
+        <Route path="deals" element={<Deals />} />
         <Route path="search" element={<SearchResults />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

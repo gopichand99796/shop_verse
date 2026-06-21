@@ -56,9 +56,27 @@ export default function MainLayout() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Link to="/products" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
                     <ArrowRight className="h-4 w-4" />
-                    About Us
+                    Products
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/categories" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                    <ArrowRight className="h-4 w-4" />
+                    Categories
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/deals" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                    <ArrowRight className="h-4 w-4" />
+                    Deals
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/orders" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                    <ArrowRight className="h-4 w-4" />
+                    Orders
                   </Link>
                 </li>
               </ul>
@@ -69,27 +87,27 @@ export default function MainLayout() {
               <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/contact" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Link to="/cart" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
                     <ArrowRight className="h-4 w-4" />
-                    Contact Us
+                    Cart
                   </Link>
                 </li>
                 <li>
-                  <Link to="/shipping" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Link to="/wishlist" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
                     <ArrowRight className="h-4 w-4" />
-                    Shipping Info
+                    Wishlist
                   </Link>
                 </li>
                 <li>
-                  <Link to="/returns" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Link to="/checkout" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
                     <ArrowRight className="h-4 w-4" />
-                    Returns
+                    Checkout
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Link to="/addresses" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2">
                     <ArrowRight className="h-4 w-4" />
-                    FAQ
+                    Shipping Addresses
                   </Link>
                 </li>
               </ul>

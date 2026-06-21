@@ -15,6 +15,7 @@ export const products = {
   list: (params: any) => api.get('/products', { params }).then(r => r.data),
   get: (id: string) => api.get(`/products/${id}`).then(r => r.data),
   bySlug: (slug: string) => api.get(`/products/slug/${slug}`).then(r => r.data),
+  featured: () => api.get('/products/featured').then(r => r.data),
 };
 
 // Categories

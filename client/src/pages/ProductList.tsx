@@ -16,20 +16,54 @@ export default function ProductList() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrand, setSelectedBrand] = useState('');
   const [sortBy, setSortBy] = useState('featured');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const categoryParam = searchParams.get('category');
   const searchParam = searchParams.get('search');
+  const [searchQuery, setSearchQuery] = useState(searchParam || '');
 
-  const { data: productsData, isLoading: productsLoading } = useQuery({
-    queryKey: ['products', { page: 1, limit: 24, category: categoryParam, search: searchParam, sortBy }],
-    queryFn: () => products.list({ page: 1, limit: 24, category: categoryParam, search: searchParam, sortBy })
-  });
+  const sortMap: Record<string, string> = {
+    featured: 'newest',
+    'price-low': 'price_asc',
+    'price-high': 'price_desc',
+    newest: 'newest',
+    rating: 'rating'
+  };
 
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categories.list()
+  });
+
+  const categoriesList = Array.isArray(categoriesData)
+    ? categoriesData
+    : Array.isArray((categoriesData as any)?.data)
+      ? (categoriesData as any).data
+      : (categoriesData as any)?.data || [];
+
+  const categoryIdFromSlug = categoryParam
+    ? categoriesList.find((category: any) => category._id === categoryParam || category.slug === categoryParam)?._id
+    : undefined;
+
+  const activeCategoryId = selectedCategories.length > 0 ? selectedCategories[0] : categoryIdFromSlug || categoryParam;
+
+  const productsQueryParams: any = {
+    page: 1,
+    limit: 24,
+    sort: sortMap[sortBy],
+  };
+
+  if (activeCategoryId) productsQueryParams.category = activeCategoryId;
+  if (selectedBrand) productsQueryParams.brand = selectedBrand;
+  if (searchQuery) productsQueryParams.search = searchQuery;
+  else if (searchParam) productsQueryParams.search = searchParam;
+  if (priceRange.min > 0) productsQueryParams.priceMin = priceRange.min;
+  if (priceRange.max < 1000) productsQueryParams.priceMax = priceRange.max;
+
+  const { data: productsData, isLoading: productsLoading, isError: productsError } = useQuery({
+    queryKey: ['products', productsQueryParams],
+    queryFn: () => products.list(productsQueryParams),
   });
 
   // Log API response to debug shape
@@ -37,8 +71,8 @@ export default function ProductList() {
   console.log('Categories API Response:', categoriesData);
 
   // Handle different response shapes: raw array, { data: [...] }, { success: true, data: [...] }, { data: { items: [...] } }
-  const productList = Array.isArray(productsData) 
-    ? productsData 
+  const productList = Array.isArray(productsData)
+    ? productsData
     : Array.isArray((productsData as any)?.data)
       ? (productsData as any).data
       : Array.isArray((productsData as any)?.data?.items)
@@ -46,11 +80,21 @@ export default function ProductList() {
         : Array.isArray((productsData as any)?.items)
           ? (productsData as any).items
           : [];
-  const categoriesList = Array.isArray(categoriesData)
-    ? categoriesData
-    : Array.isArray((categoriesData as any)?.data)
-      ? (categoriesData as any).data
-      : (categoriesData as any)?.data || [];
+
+  const brandsList: string[] = Array.from(
+    new Set(
+      (Array.isArray(productsData)
+        ? productsData
+        : Array.isArray((productsData as any)?.data)
+          ? (productsData as any).data
+          : Array.isArray((productsData as any)?.data?.items)
+            ? (productsData as any).data.items
+            : Array.isArray((productsData as any)?.items)
+              ? (productsData as any).items
+              : []
+      ).map((product: any) => String(product.brand)).filter(Boolean)
+    )
+  );
 
   const toggleCategory = (categoryId: string) => {
     setSelectedCategories(prev =>
@@ -62,6 +106,7 @@ export default function ProductList() {
 
   const clearFilters = () => {
     setSelectedCategories([]);
+    setSelectedBrand('');
     setPriceRange({ min: 0, max: 1000 });
     setSearchQuery('');
     setSearchParams({});
@@ -89,6 +134,16 @@ export default function ProductList() {
                   className="pl-10 w-full sm:w-64"
                 />
               </div>
+              <select
+                value={selectedBrand}
+                onChange={(e) => setSelectedBrand(e.target.value)}
+                className="px-4 py-3 rounded-xl border border-neutral-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">All Brands</option>
+                {brandsList.map((brand) => (
+                  <option key={brand} value={brand}>{brand}</option>
+                ))}
+              </select>
               <Button
                 variant="outline"
                 onClick={() => setIsFilterOpen(!isFilterOpen)}

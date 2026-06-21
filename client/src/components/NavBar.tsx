@@ -61,7 +61,7 @@ export default function NavBar() {
             </Link>
             {user ? (
               <Link
-                to="/account"
+                to="/orders"
                 className="p-2 rounded-xl hover:bg-neutral-100 transition-colors text-neutral-600 hover:text-primary-600"
               >
                 <User className="h-5 w-5" />
@@ -140,7 +140,7 @@ export default function NavBar() {
               </Link>
               {user ? (
                 <Link
-                  to="/account"
+                  to="/orders"
                   className="p-2 rounded-xl hover:bg-neutral-100 transition-colors text-neutral-600"
                   onClick={() => setIsMenuOpen(false)}
                 >

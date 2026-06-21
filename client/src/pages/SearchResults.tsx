@@ -5,8 +5,12 @@ import { products } from '../services/api';
 export default function SearchResults() {
   const [q] = useSearchParams();
   const qstr = q.get('q') || '';
-  const { data, isLoading } = useQuery({ queryKey: ['search', qstr], queryFn: () => products.list({ q: qstr }), enabled: qstr.length > 0 });
-  const items = (data as any)?.data || [];
+  const { data, isLoading } = useQuery({ queryKey: ['search', qstr], queryFn: () => products.list({ search: qstr }), enabled: qstr.length > 0 });
+  const items = Array.isArray(data)
+    ? data
+    : Array.isArray((data as any)?.data)
+      ? (data as any).data
+      : [];
   return (
     <div>
       <h2 className="text-xl mb-4">Search results for "{qstr}"</h2>

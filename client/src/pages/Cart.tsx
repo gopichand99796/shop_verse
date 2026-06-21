@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trash2, ShoppingBag, Plus, Minus, ArrowRight, Truck, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { formatPrice, fallbackProductImage } from '../lib/utils';
+import { formatPrice } from '../lib/utils';
+import { getProductImage, fallbackProductImage } from '../lib/productImages';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -96,7 +97,7 @@ export default function CartPage() {
                     <div className="flex gap-6">
                       <div className="w-24 h-24 bg-neutral-100 rounded-xl overflow-hidden flex-shrink-0">
                         <img
-                          src={item.product.images?.[0] || fallbackProductImage}
+                          src={getProductImage(item.product)}
                           alt={item.product.name}
                           loading="lazy"
                           onError={(e) => {

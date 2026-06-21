@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
 import Button from '../components/ui/Button';
-import { formatPrice, fallbackProductImage } from '../lib/utils';
+import { formatPrice } from '../lib/utils';
+import { getProductImage, fallbackProductImage } from '../lib/productImages';
 
 export default function Deals() {
   const featuredQuery = useQuery({ queryKey: ['featuredProducts'], queryFn: () => products.featured(), });
@@ -67,7 +68,7 @@ export default function Deals() {
                   <Card className="overflow-hidden h-full">
                     <div className="aspect-square bg-neutral-100 overflow-hidden">
                       <img
-                        src={product.images?.[0] || fallbackProductImage}
+                        src={getProductImage(product)}
                         alt={product.name}
                         loading="lazy"
                         onError={(e) => {
@@ -114,7 +115,7 @@ export default function Deals() {
                   <Card className="overflow-hidden h-full">
                     <div className="aspect-square bg-neutral-100 overflow-hidden">
                       <img
-                        src={product.images?.[0] || fallbackProductImage}
+                        src={getProductImage(product)}
                         alt={product.name}
                         loading="lazy"
                         onError={(e) => {
@@ -161,7 +162,7 @@ export default function Deals() {
                   <Card className="overflow-hidden h-full">
                     <div className="aspect-square bg-neutral-100 overflow-hidden">
                       <img
-                        src={product.images?.[0] || fallbackProductImage}
+                        src={getProductImage(product)}
                         alt={product.name}
                         loading="lazy"
                         onError={(e) => {

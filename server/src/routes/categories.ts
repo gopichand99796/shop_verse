@@ -16,4 +16,3 @@ router.post('/', requireAuth, requireRole('admin'), mongoSanitize, (req, res, ne
 router.get('/:id', getCategory);
 
 export default router;
-cc 

@@ -4,7 +4,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, SlidersHorizontal, ChevronDown, Search, X } from 'lucide-react';
 import { useState } from 'react';
-import { formatPrice, fallbackProductImage } from '../lib/utils';
+import { formatPrice } from '../lib/utils';
+import { getProductImage, fallbackProductImage } from '../lib/productImages';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -296,7 +297,7 @@ export default function ProductList() {
                         <div className="relative">
                           <div className="aspect-square bg-neutral-100 overflow-hidden">
                             <img
-                              src={product.images?.[0] || fallbackProductImage}
+                              src={getProductImage(product)}
                               alt={product.name}
                               loading="lazy"
                               onError={(e) => {

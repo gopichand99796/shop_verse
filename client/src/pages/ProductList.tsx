@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, SlidersHorizontal, ChevronDown, Search, X } from 'lucide-react';
 import { useState } from 'react';
-import { formatPrice } from '../lib/utils';
+import { formatPrice, fallbackProductImage } from '../lib/utils';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -67,7 +67,6 @@ export default function ProductList() {
     queryFn: () => products.list(productsQueryParams),
   });
 
-  const fallbackProductImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80';
   const addItem = useCart((state) => state.addItem);
 
   // Log API response to debug shape

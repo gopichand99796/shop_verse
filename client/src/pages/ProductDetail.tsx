@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, Clock, ChevronLeft, Check, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { formatPrice } from '../lib/utils';
+import { formatPrice, fallbackProductImage } from '../lib/utils';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -95,8 +95,13 @@ export default function ProductDetail() {
             <Card className="overflow-hidden">
               <div className="aspect-square bg-neutral-100">
                 <img
-                  src={product.images?.[selectedImage] || 'https://via.placeholder.com/600x600'}
+                  src={product.images?.[selectedImage] || fallbackProductImage}
                   alt={product.name}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = fallbackProductImage;
+                  }}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -112,8 +117,13 @@ export default function ProductDetail() {
                     }`}
                   >
                     <img
-                      src={image}
+                      src={image || fallbackProductImage}
                       alt={`${product.name} ${index + 1}`}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = fallbackProductImage;
+                      }}
                       className="w-full h-full object-cover"
                     />
                   </button>

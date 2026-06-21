@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Star, Truck, Shield, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import { formatPrice } from '../lib/utils';
+import { formatPrice, fallbackProductImage } from '../lib/utils';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -218,8 +218,13 @@ export default function Landing() {
                       <div className="relative">
                         <div className="aspect-square bg-neutral-100 overflow-hidden">
                           <img
-                            src={product.images?.[0] || 'https://via.placeholder.com/400x400'}
+                            src={product.images?.[0] || fallbackProductImage}
                             alt={product.name}
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = fallbackProductImage;
+                            }}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
@@ -326,8 +331,13 @@ export default function Landing() {
                       <div className="relative">
                         <div className="aspect-square bg-neutral-100 overflow-hidden">
                           <img
-                            src={product.images?.[0] || 'https://via.placeholder.com/400x400'}
+                            src={product.images?.[0] || fallbackProductImage}
                             alt={product.name}
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = fallbackProductImage;
+                            }}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>

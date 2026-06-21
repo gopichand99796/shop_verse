@@ -12,6 +12,7 @@
     "dev:client": "npm --prefix client run dev",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "lint": "npm --prefix server run lint && npm --prefix client run lint",
+    "sync-product-images": "node scripts/sync-product-images.js",
     "build": "npm --prefix server run build && npm --prefix client run build"
   },
   "devDependencies": {

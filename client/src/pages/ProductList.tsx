@@ -32,8 +32,25 @@ export default function ProductList() {
     queryFn: () => categories.list()
   });
 
-  const productList = (productsData as any)?.data?.items || [];
-  const categoriesList = (categoriesData as any)?.data || [];
+  // Log API response to debug shape
+  console.log('Products API Response:', productsData);
+  console.log('Categories API Response:', categoriesData);
+
+  // Handle different response shapes: raw array, { data: [...] }, { success: true, data: [...] }, { data: { items: [...] } }
+  const productList = Array.isArray(productsData) 
+    ? productsData 
+    : Array.isArray((productsData as any)?.data)
+      ? (productsData as any).data
+      : Array.isArray((productsData as any)?.data?.items)
+        ? (productsData as any).data.items
+        : Array.isArray((productsData as any)?.items)
+          ? (productsData as any).items
+          : [];
+  const categoriesList = Array.isArray(categoriesData)
+    ? categoriesData
+    : Array.isArray((categoriesData as any)?.data)
+      ? (categoriesData as any).data
+      : (categoriesData as any)?.data || [];
 
   const toggleCategory = (categoryId: string) => {
     setSelectedCategories(prev =>
@@ -246,6 +263,9 @@ export default function ProductList() {
                           <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
                             {product.name}
                           </h3>
+                          {product.category && (
+                            <p className="text-sm text-neutral-500 mb-2">{product.category.name || product.category}</p>
+                          )}
                           <div className="flex items-center gap-1 mb-2">
                             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm text-neutral-600">{product.ratings?.avg || 0}</span>

@@ -30,7 +30,13 @@ export default function ProductDetail() {
     }
   });
 
-  const product = (data as any)?.data;
+  // Log API response to debug shape
+  console.log('ProductDetail - API Response:', data);
+
+  // Handle different response shapes: raw object, { data: {...} }, { success: true, data: {...} }
+  const product = data && typeof data === 'object' && !Array.isArray(data)
+    ? (data as any)?.data || data
+    : null;
   const err = (data as any)?.error || (data as any)?.message || null;
 
   const handleAddToCart = () => {

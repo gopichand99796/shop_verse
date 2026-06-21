@@ -27,9 +27,31 @@ export default function Landing() {
     queryFn: () => banners.list()
   });
 
-  const featuredProducts = (productsData as any)?.data?.items || [];
-  const categoriesList = (categoriesData as any)?.data || [];
-  const bannersList = (bannersData as any)?.data || [];
+  // Log API response to debug shape
+  console.log('Landing - Products API Response:', productsData);
+  console.log('Landing - Categories API Response:', categoriesData);
+  console.log('Landing - Banners API Response:', bannersData);
+
+  // Handle different response shapes: raw array, { data: [...] }, { success: true, data: [...] }, { data: { items: [...] } }
+  const featuredProducts = Array.isArray(productsData) 
+    ? productsData 
+    : Array.isArray((productsData as any)?.data)
+      ? (productsData as any).data
+      : Array.isArray((productsData as any)?.data?.items)
+        ? (productsData as any).data.items
+        : Array.isArray((productsData as any)?.items)
+          ? (productsData as any).items
+          : [];
+  const categoriesList = Array.isArray(categoriesData)
+    ? categoriesData
+    : Array.isArray((categoriesData as any)?.data)
+      ? (categoriesData as any).data
+      : (categoriesData as any)?.data || [];
+  const bannersList = Array.isArray(bannersData)
+    ? bannersData
+    : Array.isArray((bannersData as any)?.data)
+      ? (bannersData as any).data
+      : (bannersData as any)?.data || [];
 
   const nextBanner = () => {
     setCurrentBanner((prev) => (prev + 1) % bannersList.length);

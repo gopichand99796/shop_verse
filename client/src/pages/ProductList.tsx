@@ -10,6 +10,7 @@ import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
 import Badge from '../components/ui/Badge';
 import Input from '../components/ui/Input';
+import useCart from '../store/useCart';
 
 export default function ProductList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,6 +66,9 @@ export default function ProductList() {
     queryKey: ['products', productsQueryParams],
     queryFn: () => products.list(productsQueryParams),
   });
+
+  const fallbackProductImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80';
+  const addItem = useCart((state) => state.addItem);
 
   // Log API response to debug shape
   console.log('Products API Response:', productsData);
@@ -293,8 +297,13 @@ export default function ProductList() {
                         <div className="relative">
                           <div className="aspect-square bg-neutral-100 overflow-hidden">
                             <img
-                              src={product.images?.[0] || 'https://via.placeholder.com/400x400'}
+                              src={product.images?.[0] || fallbackProductImage}
                               alt={product.name}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = fallbackProductImage;
+                              }}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           </div>
@@ -322,19 +331,48 @@ export default function ProductList() {
                             <p className="text-sm text-neutral-500 mb-2">{product.category.name || product.category}</p>
                           )}
                           <div className="flex items-center gap-1 mb-2">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm text-neutral-600">{product.ratings?.avg || 0}</span>
+                            {Array.from({ length: 5 }).map((_, starIndex) => (
+                              <Star
+                                key={starIndex}
+                                className={`h-4 w-4 ${starIndex < Math.round(product.ratings?.avg || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-neutral-300'}`}
+                              />
+                            ))}
+                            <span className="text-sm text-neutral-600 ml-2">{product.ratings?.avg?.toFixed(1) || '0.0'}</span>
                             <span className="text-sm text-neutral-400">({product.ratings?.count || 0})</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold text-neutral-900">
-                              {formatPrice(product.discountPrice || product.price)}
-                            </span>
-                            {product.discountPrice && product.discountPrice < product.price && (
-                              <span className="text-sm text-neutral-400 line-through">
-                                {formatPrice(product.price)}
-                              </span>
-                            )}
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <div className="text-lg font-bold text-neutral-900">
+                                {formatPrice(product.discountPrice || product.price)}
+                              </div>
+                              {product.discountPrice && product.discountPrice < product.price && (
+                                <span className="text-sm text-neutral-400 line-through">
+                                  {formatPrice(product.price)}
+                                </span>
+                              )}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="whitespace-nowrap"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                addItem(product._id);
+                              }}
+                              disabled={product.stock === 0}
+                            >
+                              Quick Add
+                            </Button>
+                          </div>
+                          <div className="mt-3">
+                            <Badge variant={product.stock === 0 ? 'danger' : product.stock < 10 ? 'warning' : 'success'}>
+                              {product.stock === 0
+                                ? 'Out of stock'
+                                : product.stock < 10
+                                  ? `Only ${product.stock} left`
+                                  : `${product.stock} in stock`}
+                            </Badge>
                           </div>
                         </div>
                       </Card>

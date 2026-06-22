@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: shopverse-server
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: BCRYPT_SALT_ROUNDS
+        value: 12
+      - key: CLIENT_URL
+        sync: false

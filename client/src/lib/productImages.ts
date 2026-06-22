@@ -23,9 +23,24 @@ const productImageNames = new Set([
 
 export function getProductImage(product: any): string | undefined {
   const name = product?.name;
-  if (typeof name !== 'string' || !productImageNames.has(name)) {
+  if (typeof name !== 'string') {
     return undefined;
   }
 
-  return `/products/${encodeURIComponent(name)}.png`;
+  // Check if product has a specific image
+  if (product.image) {
+    return product.image;
+  }
+
+  // Check if product name is in the predefined list
+  if (productImageNames.has(name)) {
+    return `/products/${encodeURIComponent(name)}.png`;
+  }
+
+  // Check if product has images array
+  if (product.images && product.images.length > 0) {
+    return product.images[0];
+  }
+
+  return undefined;
 }

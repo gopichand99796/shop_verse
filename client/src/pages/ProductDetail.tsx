@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { products, cart } from '../services/api';
+import { products, cart, wishlist } from '../services/api';
 import { useParams, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, Clock, ChevronLeft, Check, Minus, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, ChevronLeft, Clock, Check, Minus, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import useAuth from '../store/useAuth';
 import { getProductImage } from '../lib/productImages';
 import { formatPrice } from '../lib/utils';
 import Card from '../components/ui/Card';
@@ -17,6 +19,7 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const qc = useQueryClient();
+  const isAuthenticated = useAuth((s) => s.isAuthenticated);
 
   const { data, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -24,21 +27,45 @@ export default function ProductDetail() {
     enabled: !!id
   });
 
-  const addToCartMutation = useMutation({
-    mutationFn: (productId: string) => cart.add(productId, quantity),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['cart'] });
-    }
-  });
-
-  // Log API response to debug shape
-  console.log('ProductDetail - API Response:', data);
-
-  // Handle different response shapes: raw object, { data: {...} }, { success: true, data: {...} }
   const responseData = data as any;
   const product = responseData && typeof responseData === 'object' && !Array.isArray(responseData)
     ? responseData.data || responseData
     : null;
+
+  const { data: wishlistData } = useQuery({ queryKey: ['wishlist'], queryFn: () => wishlist.list(), enabled: isAuthenticated && !!product });
+
+  const addToCartMutation = useMutation({
+    mutationFn: (productId: string) => cart.add(productId, quantity),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cart'] });
+      toast.success('Added to cart');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Could not add to cart');
+    }
+  });
+
+  const wishlistMutation = useMutation({
+    mutationFn: (productId: string) => wishlist.toggle(productId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['wishlist'] });
+      setIsWishlisted((prev) => !prev);
+      toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Wishlist update failed');
+    }
+  });
+
+  useEffect(() => {
+    if (!wishlistData?.data || !product) return;
+    const present = (wishlistData.data as any[]).some((item) => String(item._id) === String(product._id));
+    setIsWishlisted(present);
+  }, [wishlistData, product]);
+
+  // Log API response to debug shape
+  console.log('ProductDetail - API Response:', data);
+
   const err = responseData && typeof responseData === 'object' && responseData.success === false
     ? responseData.message || responseData.error || 'Unable to load product'
     : null;
@@ -47,6 +74,11 @@ export default function ProductDetail() {
     if (product && product.stock > 0) {
       addToCartMutation.mutate(product._id);
     }
+  };
+
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    wishlistMutation.mutate(product._id);
   };
 
   const handleQuantityChange = (delta: number) => {
@@ -228,9 +260,10 @@ export default function ProductDetail() {
                 </Button>
                 <Button
                   size="lg"
-                  variant="outline"
-                  onClick={() => setIsWishlisted(!isWishlisted)}
+                  variant={isWishlisted ? 'secondary' : 'outline'}
+                  onClick={handleToggleWishlist}
                   className={isWishlisted ? 'text-accent-600 border-accent-600' : ''}
+                  disabled={wishlistMutation.isPending}
                 >
                   <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`} />
                 </Button>

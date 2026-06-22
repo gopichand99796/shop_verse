@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { auth } from '../services/api';
+import { toast } from 'react-toastify';
+import useAuth from '../store/useAuth';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Eye, EyeOff, ShoppingCart, ArrowRight, Check } from 'lucide-react';
 import Card from '../components/ui/Card';
@@ -18,6 +19,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const nav = useNavigate();
+  const register = useAuth((s) => s.register);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,10 +36,24 @@ export default function Register() {
     }
 
     setIsLoading(true);
+    const promise = register(name, email, password);
+    toast.promise(
+      promise,
+      {
+        pending: 'Creating your account...',
+        success: 'Registration complete! Redirecting...',
+        error: {
+          render({ data }: any) {
+            return data?.response?.data?.message || 'Registration failed. Please try again.';
+          }
+        }
+      }
+    );
+
     try {
-      await auth.register({ name, email, password });
+      await promise;
       setSuccess(true);
-      setTimeout(() => nav('/login'), 2000);
+      setTimeout(() => nav('/'), 1200);
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Registration failed. Please try again.');
     } finally {

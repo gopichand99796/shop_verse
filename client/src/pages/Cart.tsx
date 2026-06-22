@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { cart } from '../services/api';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -16,7 +17,13 @@ export default function CartPage() {
   const { data, isLoading } = useQuery({ queryKey: ['cart'], queryFn: () => cart.get() });
   const removeMutation = useMutation({ 
     mutationFn: (id: string) => cart.remove(id), 
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['cart'] }) 
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cart'] });
+      toast.success('Item removed from cart');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Unable to remove item');
+    }
   });
 
   const items = (data as any)?.data?.items || [];

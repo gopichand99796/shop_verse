@@ -1,13 +1,12 @@
-import axios from 'axios';
-
-const api = axios.create({ baseURL: (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001/api/v1' });
+import api from './http';
 
 // Auth
 export const auth = {
   login: (payload: { email: string; password: string }) => api.post('/auth/login', payload).then(r => r.data),
   register: (payload: { name: string; email: string; password: string }) => api.post('/auth/register', payload).then(r => r.data),
-  refresh: (token: string) => api.post('/auth/refresh', { token }).then(r => r.data),
-  logout: () => api.post('/auth/logout').then(r => r.data),
+  refresh: (refreshToken: string) => api.post('/auth/refresh', { refreshToken }).then(r => r.data),
+  logout: (refreshToken?: string) => api.post('/auth/logout', { refreshToken }).then(r => r.data),
+  me: () => api.get('/auth/me').then(r => r.data),
 };
 
 // Products

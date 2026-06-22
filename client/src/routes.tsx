@@ -14,6 +14,7 @@ import Wishlist from './pages/Wishlist';
 import Addresses from './pages/Addresses';
 import Orders from './pages/Orders';
 import OrderTracking from './pages/OrderTracking';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
@@ -35,6 +36,7 @@ export default function AppRoutes() {
         <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
         <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+        <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path="orders/:id" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import useAuth from '../store/useAuth';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ShoppingCart, ArrowRight } from 'lucide-react';
@@ -18,10 +19,24 @@ export default function Login() {
 
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    setIsLoading(true);
+    const promise = login(email, password);
+    toast.promise(
+      promise,
+      {
+        pending: 'Signing you in...',
+        success: 'Welcome back!',
+        error: {
+          render({ data }: any) {
+            return data?.response?.data?.message || 'Login failed. Please try again.';
+          }
+        }
+      }
+    );
+
     try {
-      await login(email, password);
+      await promise;
       nav('/');
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Login failed. Please try again.');

@@ -1,8 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 
-const baseURL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001/api/v1';
+const baseURL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:4000/api/v1';
 
+console.log('API baseURL:', baseURL);
 const api = axios.create({ baseURL, timeout: 10000 });
 
 export function getAccessToken() {

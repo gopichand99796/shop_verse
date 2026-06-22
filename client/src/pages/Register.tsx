@@ -20,7 +20,6 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
   const nav = useNavigate();
   const register = useAuth((s) => s.register);
-  const authState = useAuth((s) => ({ user: s.user, isAuthenticated: s.isAuthenticated }));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ export default function Register() {
     }
 
     setIsLoading(true);
-    console.log('Register page auth state before submit:', authState);
+    console.log('Register page auth state before submit:', useAuth.getState());
     const promise = register(name, email, password);
     toast.promise(
       promise,
@@ -54,7 +53,7 @@ export default function Register() {
 
     try {
       await promise;
-      console.log('Register page auth state after submit:', { user: authState.user, isAuthenticated: authState.isAuthenticated });
+      console.log('Register page auth state after submit:', useAuth.getState());
       setSuccess(true);
       setTimeout(() => nav('/'), 1200);
     } catch (err: any) {

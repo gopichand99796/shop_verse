@@ -11,7 +11,9 @@ export default function NavBar() {
   const user = useAuth((s) => s.user);
   const isAuthenticated = useAuth((s) => s.isAuthenticated);
   const logout = useAuth((s) => s.logout);
-  console.log('Navbar Auth State:', { user, isAuthenticated });
+  console.log('Navbar render');
+  console.log('isAuthenticated:', isAuthenticated);
+  console.log('user:', user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const nav = useNavigate();
 

@@ -73,7 +73,10 @@ export const useAuth = create<State>((set) => ({
       throw e;
     }
 
+    console.log('Login success');
+    console.log('Fetched profile:', userProfile);
     set({ token: data.accessToken, refreshToken: data.refreshToken, user: userProfile, isAuthenticated: true });
+    console.log('Store updated:', { user: userProfile, isAuthenticated: true });
 
     // merge local guest cart into user's cart
     try {
@@ -158,5 +161,15 @@ export const useAuth = create<State>((set) => ({
   setAuthHeader(null);
   useAuth.setState({ token: null, refreshToken: null, user: null, isAuthenticated: false, loading: false });
 })();
+
+useAuth.subscribe((state) => {
+  console.log('Store updated:', {
+    token: state.token,
+    refreshToken: state.refreshToken,
+    user: state.user,
+    isAuthenticated: state.isAuthenticated,
+    loading: state.loading,
+  });
+});
 
 export default useAuth;

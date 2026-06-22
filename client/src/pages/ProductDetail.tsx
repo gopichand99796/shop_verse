@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, Clock, ChevronLeft, Check, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { getProductImage } from '../lib/productImages';
 import { formatPrice } from '../lib/utils';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -94,15 +95,15 @@ export default function ProductDetail() {
           <div className="space-y-4">
             <Card className="overflow-hidden">
               <div className="aspect-square bg-neutral-100">
-                {product.images?.[0] ? (
+                {getProductImage(product) ? (
                   <img
-                    src={product.images[0]}
+                    src={getProductImage(product)}
                     alt={product.name}
                     loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-sm text-neutral-500">No Image</div>
+                  <div className="flex items-center justify-center h-full text-sm text-neutral-500">No Image Available</div>
                 )}
               </div>
             </Card>

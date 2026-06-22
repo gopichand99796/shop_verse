@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
 import Button from '../components/ui/Button';
+import { getProductImage } from '../lib/productImages';
 import { formatPrice } from '../lib/utils';
 
 export default function Deals() {
@@ -66,15 +67,15 @@ export default function Deals() {
                 <Link to={`/products/${product._id}`}>
                   <Card className="overflow-hidden h-full">
                     <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
-                      {product.images?.[0] ? (
+                      {getProductImage(product) ? (
                         <img
-                          src={product.images[0]}
+                          src={getProductImage(product)}
                           alt={product.name}
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="text-sm">No Image</div>
+                        <div className="text-sm">No Image Available</div>
                       )}
                     </div>
                     <div className="p-4">
@@ -113,15 +114,15 @@ export default function Deals() {
                 <Link to={`/products/${product._id}`}>
                   <Card className="overflow-hidden h-full">
                     <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
-                      {product.images?.[0] ? (
+                      {getProductImage(product) ? (
                         <img
-                          src={product.images[0]}
+                          src={getProductImage(product)}
                           alt={product.name}
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="text-sm">No Image</div>
+                        <div className="text-sm">No Image Available</div>
                       )}
                     </div>
                     <div className="p-4">
@@ -160,15 +161,15 @@ export default function Deals() {
                 <Link to={`/products/${product._id}`}>
                   <Card className="overflow-hidden h-full">
                     <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
-                      {product.images?.[0] ? (
+                      {getProductImage(product) ? (
                         <img
-                          src={product.images[0]}
+                          src={getProductImage(product)}
                           alt={product.name}
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="text-sm">No Image</div>
+                        <div className="text-sm">No Image Available</div>
                       )}
                     </div>
                     <div className="p-4">

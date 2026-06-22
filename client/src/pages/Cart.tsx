@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trash2, ShoppingBag, Plus, Minus, ArrowRight, Truck, Shield } from 'lucide-react';
 import { useState } from 'react';
+import { getProductImage } from '../lib/productImages';
 import { formatPrice } from '../lib/utils';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -95,15 +96,15 @@ export default function CartPage() {
                   <Card className="p-6">
                     <div className="flex gap-6">
                       <div className="w-24 h-24 bg-neutral-100 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-neutral-500">
-                        {item.product.images?.[0] ? (
+                        {getProductImage(item.product) ? (
                           <img
-                            src={item.product.images[0]}
+                            src={getProductImage(item.product)}
                             alt={item.product.name}
                             loading="lazy"
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="text-xs text-center">No Image</div>
+                          <div className="text-xs text-center">No Image Available</div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">

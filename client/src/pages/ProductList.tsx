@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, SlidersHorizontal, ChevronDown, Search, X } from 'lucide-react';
 import { useState } from 'react';
+import { getProductImage } from '../lib/productImages';
 import { formatPrice } from '../lib/utils';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -295,15 +296,15 @@ export default function ProductList() {
                       <Card className="group h-full hover:shadow-medium transition-all duration-300 cursor-pointer overflow-hidden">
                         <div className="relative">
                           <div className="aspect-square bg-neutral-100 overflow-hidden">
-                            {product.images?.[0] ? (
+                            {getProductImage(product) ? (
                               <img
-                                src={product.images[0]}
+                                src={getProductImage(product)}
                                 alt={product.name}
                                 loading="lazy"
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
-                              <div className="flex items-center justify-center h-full text-sm text-neutral-500">No Image</div>
+                              <div className="flex items-center justify-center h-full text-sm text-neutral-500">No Image Available</div>
                             )}
                           </div>
                           {product.discountPrice && product.discountPrice < product.price && (

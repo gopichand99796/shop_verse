@@ -4,76 +4,95 @@ import { DollarSign, ShoppingCart, Package, Users, TrendingUp, ArrowUpRight } fr
 import { motion } from 'framer-motion';
 import { formatPrice } from '../../lib/utils';
 import Card from '../../components/ui/Card';
+import api from '../../services/api';
 
 const COLORS = ['#0ea5e9', '#d946ef', '#10b981', '#f59e0b'];
 
 export default function AdminDashboard() {
-  // Mock data - in production, this would come from API
-  const revenueData = [
-    { name: 'Jan', revenue: 45000 },
-    { name: 'Feb', revenue: 52000 },
-    { name: 'Mar', revenue: 48000 },
-    { name: 'Apr', revenue: 61000 },
-    { name: 'May', revenue: 55000 },
-    { name: 'Jun', revenue: 67000 },
-  ];
+  const { data: revenueData } = useQuery({ 
+    queryKey: ['admin-analytics-revenue'], 
+    queryFn: () => api.get('/admin/analytics/revenue').then(r => r.data) 
+  });
+  
+  const { data: categoryData } = useQuery({ 
+    queryKey: ['admin-analytics-category'], 
+    queryFn: () => api.get('/admin/analytics/sales-by-category').then(r => r.data) 
+  });
+  
+  const { data: topProducts } = useQuery({ 
+    queryKey: ['admin-analytics-products'], 
+    queryFn: () => api.get('/admin/analytics/top-products').then(r => r.data) 
+  });
 
-  const ordersData = [
-    { name: 'Mon', orders: 120 },
-    { name: 'Tue', orders: 145 },
-    { name: 'Wed', orders: 132 },
-    { name: 'Thu', orders: 168 },
-    { name: 'Fri', orders: 189 },
-    { name: 'Sat', orders: 210 },
-    { name: 'Sun', orders: 195 },
-  ];
+  const { data: signups } = useQuery({ 
+    queryKey: ['admin-analytics-signups'], 
+    queryFn: () => api.get('/admin/analytics/signups').then(r => r.data) 
+  });
 
-  const categoryData = [
-    { name: 'Electronics', value: 400 },
-    { name: 'Fashion', value: 300 },
-    { name: 'Home', value: 200 },
-    { name: 'Sports', value: 150 },
-    { name: 'Books', value: 100 },
-  ];
+  const { data: aov } = useQuery({ 
+    queryKey: ['admin-analytics-aov'], 
+    queryFn: () => api.get('/admin/analytics/aov').then(r => r.data) 
+  });
+
+  const { data: conversion } = useQuery({ 
+    queryKey: ['admin-analytics-conversion'], 
+    queryFn: () => api.get('/admin/analytics/conversion').then(r => r.data) 
+  });
+
+  const { data: ordersData } = useQuery({
+    queryKey: ['admin-orders'],
+    queryFn: () => api.get('/orders').then(r => r.data)
+  });
+
+  const revenueArray = Array.isArray(revenueData) ? revenueData : (revenueData as any)?.data || [];
+  const categoryArray = Array.isArray(categoryData) ? categoryData : (categoryData as any)?.data || [];
+  const productsArray = Array.isArray(topProducts) ? topProducts : (topProducts as any)?.data || [];
+  const signupsArray = Array.isArray(signups) ? signups : (signups as any)?.data || [];
+  const ordersArray = Array.isArray(ordersData) ? ordersData : (ordersData as any)?.data || [];
+
+  const totalRevenue = revenueArray.reduce((sum: number, item: any) => sum + (item.revenue || 0), 0);
+  const totalOrders = ordersArray.length;
+  const totalProducts = productsArray.length;
+  const totalCustomers = signupsArray.length;
 
   const stats = [
     {
       title: 'Total Revenue',
-      value: '$328,450',
+      value: formatPrice(totalRevenue),
       change: '+12.5%',
       icon: DollarSign,
       color: 'bg-primary-500',
     },
     {
       title: 'Total Orders',
-      value: '1,245',
+      value: totalOrders.toString(),
       change: '+8.2%',
       icon: ShoppingCart,
       color: 'bg-accent-500',
     },
     {
       title: 'Total Products',
-      value: '348',
+      value: totalProducts.toString(),
       change: '+5.1%',
       icon: Package,
       color: 'bg-green-500',
     },
     {
       title: 'Total Customers',
-      value: '2,847',
+      value: totalCustomers.toString(),
       change: '+15.3%',
       icon: Users,
       color: 'bg-orange-500',
     },
   ];
 
-  const recentOrders = [
-    { id: '#ORD-001', customer: 'John Doe', amount: 129.99, status: 'completed', date: '2 min ago' },
-    { id: '#ORD-002', customer: 'Jane Smith', amount: 89.99, status: 'processing', date: '15 min ago' },
-    { id: '#ORD-003', customer: 'Bob Johnson', amount: 249.99, status: 'pending', date: '1 hour ago' },
-    { id: '#ORD-004', customer: 'Alice Williams', amount: 59.99, status: 'completed', date: '2 hours ago' },
-    { id: '#ORD-005', customer: 'Charlie Brown', amount: 179.99, status: 'shipped', date: '3 hours ago' },
-  ];
+  const recentOrders = ordersArray.slice(0, 5).map((order: any) => ({
+    id: order._id ? `#ORD-${order._id.slice(-6)}` : '#ORD-000',
+    customer: order.user?.name || order.customer || 'Unknown',
+    amount: order.total || order.amount || 0,
+    status: order.status || 'pending',
+    date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Unknown'
+  }));
 
   return (
     <div className="animate-fade-in">
@@ -116,7 +135,7 @@ export default function AdminDashboard() {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-6">Revenue Overview</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={revenueData}>
+            <BarChart data={revenueArray}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
               <XAxis dataKey="name" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
               <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value/1000}k`} />
@@ -139,7 +158,7 @@ export default function AdminDashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={categoryData}
+                data={categoryArray}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -147,7 +166,7 @@ export default function AdminDashboard() {
                 paddingAngle={5}
                 dataKey="value"
               >
-                {categoryData.map((entry, index) => (
+                {categoryArray.map((entry: any, index: number) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -162,7 +181,7 @@ export default function AdminDashboard() {
             </PieChart>
           </ResponsiveContainer>
           <div className="flex flex-wrap justify-center gap-4 mt-4">
-            {categoryData.map((entry, index) => (
+            {categoryArray.map((entry: any, index: number) => (
               <div key={entry.name} className="flex items-center gap-2 text-sm">
                 <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                 <span className="text-neutral-600">{entry.name}</span>
@@ -173,9 +192,9 @@ export default function AdminDashboard() {
       </div>
 
       <Card className="p-6 mb-8">
-        <h3 className="text-lg font-semibold mb-6">Weekly Orders</h3>
+        <h3 className="text-lg font-semibold mb-6">Recent Orders</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={ordersData}>
+          <LineChart data={ordersArray}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
             <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
@@ -212,7 +231,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {recentOrders.map((order, index) => (
+              {recentOrders.map((order: any, index: number) => (
                 <tr key={order.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
                   <td className="py-4 px-4 text-sm font-medium text-neutral-900">{order.id}</td>
                   <td className="py-4 px-4 text-sm text-neutral-600">{order.customer}</td>

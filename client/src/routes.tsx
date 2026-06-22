@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
+import AdminAnalytics from './pages/admin/Analytics';
 
 export default function AppRoutes() {
   return (
@@ -41,7 +42,9 @@ export default function AppRoutes() {
         <Route path="orders/:id" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
 
         <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>}>
+          <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
         </Route>
       </Route>
     </Routes>

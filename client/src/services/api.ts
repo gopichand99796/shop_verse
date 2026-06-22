@@ -30,8 +30,8 @@ export const banners = {
 // Cart
 export const cart = {
   get: () => api.get('/cart').then(r => r.data),
-  add: (productId: string, qty = 1) => api.post('/cart/items', { productId, qty }).then(r => r.data),
-  remove: (itemId: string) => api.delete(`/cart/items/${itemId}`).then(r => r.data),
+  add: (productId: string, qty = 1) => api.post('/cart', { productId, qty }).then(r => r.data),
+  remove: (productId: string) => api.delete(`/cart/${productId}`).then(r => r.data),
 };
 
 // Orders

@@ -15,8 +15,8 @@ import EmptyState from '../components/ui/EmptyState';
 export default function CartPage() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ['cart'], queryFn: () => cart.get() });
-  const removeMutation = useMutation({ 
-    mutationFn: (id: string) => cart.remove(id), 
+  const removeMutation = useMutation({
+    mutationFn: (productId: string) => cart.remove(productId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['cart'] });
       toast.success('Item removed from cart');
@@ -29,20 +29,30 @@ export default function CartPage() {
   const items = (data as any)?.data?.items || [];
   const err = (data as any)?.error || (data as any)?.message || null;
 
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
-  const updateQuantity = (itemId: string, delta: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [itemId]: Math.max(1, (prev[itemId] || 1) + delta)
-    }));
+  const updateQuantityMutation = useMutation({
+    mutationFn: ({ productId, qty }: { productId: string; qty: number }) => cart.add(productId, qty),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cart'] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Unable to update quantity');
+    }
+  });
+
+  const updateQuantity = (productId: string, delta: number) => {
+    const item = items.find((i: any) => i.product._id === productId);
+    const currentQty = item?.qty || 1;
+    const newQty = Math.max(1, currentQty + delta);
+    if (newQty !== currentQty) {
+      updateQuantityMutation.mutate({ productId, qty: newQty });
+    }
   };
 
   const subtotal = items.reduce((sum: number, item: any) => {
-    const qty = quantities[item._id] || item.qty || 1;
-    return sum + (item.product.price * qty);
+    return sum + (item.product.price * (item.qty || 1));
   }, 0);
 
   const shipping = subtotal > 50 ? 0 : 5.99;
@@ -122,24 +132,24 @@ export default function CartPage() {
                         <div className="flex items-center gap-2 mt-3">
                           <div className="flex items-center border border-neutral-300 rounded-lg">
                             <button
-                              onClick={() => updateQuantity(item._id, -1)}
-                              disabled={(quantities[item._id] || item.qty || 1) <= 1}
+                              onClick={() => updateQuantity(item.product._id, -1)}
+                              disabled={(item.qty || 1) <= 1}
                               className="p-2 hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
                             <span className="px-3 py-2 font-medium min-w-[40px] text-center">
-                              {quantities[item._id] || item.qty || 1}
+                              {item.qty || 1}
                             </span>
                             <button
-                              onClick={() => updateQuantity(item._id, 1)}
+                              onClick={() => updateQuantity(item.product._id, 1)}
                               className="p-2 hover:bg-neutral-100 transition-colors"
                             >
                               <Plus className="h-4 w-4" />
                             </button>
                           </div>
                           <button
-                            onClick={() => removeMutation.mutate(item._id)}
+                            onClick={() => removeMutation.mutate(item.product._id)}
                             className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                             disabled={removeMutation.isPending}
                           >
@@ -149,7 +159,7 @@ export default function CartPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-neutral-900">
-                          {formatPrice(item.product.price * (quantities[item._id] || item.qty || 1))}
+                          {formatPrice(item.product.price * (item.qty || 1))}
                         </p>
                         <p className="text-sm text-neutral-500">{formatPrice(item.product.price)} each</p>
                       </div>

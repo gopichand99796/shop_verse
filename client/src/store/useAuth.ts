@@ -1,7 +1,7 @@
 import create from 'zustand';
 import { toast } from 'react-toastify';
 import { auth as apiAuth } from '../services/api';
-import { setAuthHeader } from '../services/http';
+import { clearAuthTokens, setAuthHeader } from '../services/http';
 import useCart from './useCart';
 import { cart as apiCart } from '../services/api';
 
@@ -26,7 +26,10 @@ export const useAuth = create<State>((set) => ({
   user: null,
   isAuthenticated: false,
   loading: true,
-  setUser: (u) => set({ user: u, isAuthenticated: !!u }),
+  setUser: (u) => {
+    console.log('Auth State: setUser', u);
+    set({ user: u, isAuthenticated: !!u });
+  },
   setToken: (t) => set({ token: t }),
   register: async (name, email, password) => {
     const res = await apiAuth.register({ name, email, password });
@@ -35,6 +38,7 @@ export const useAuth = create<State>((set) => ({
     try {
       await (set as any).getState().login(email, password);
     } catch (e) {
+      console.warn('Auth State: auto-login after register failed', e);
       // ignore login failure; user can still sign in manually
     }
     return res;
@@ -42,38 +46,52 @@ export const useAuth = create<State>((set) => ({
   login: async (email, password) => {
     const res = await apiAuth.login({ email, password });
     const data = (res as any);
-    if (data?.accessToken) {
-      // persist tokens
-      localStorage.setItem('accessToken', data.accessToken);
-      if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-      setAuthHeader(data.accessToken);
-      set({ token: data.accessToken, refreshToken: data.refreshToken });
-
-      // fetch user profile
-      try {
-        const me = await apiAuth.me();
-        if (me?.data) set({ user: me.data });
-      } catch (e) {
-        // ignore
-      }
-
-      // merge local guest cart into user's cart
-      try {
-        const guest = useCart.getState().items;
-        for (const it of guest) {
-          await apiCart.add(it.productId, it.qty);
-        }
-        // refresh server cart into local state
-        const serverCart = await apiCart.get();
-        if (serverCart?.data?.items) {
-          const mapped = serverCart.data.items.map((i: any) => ({ productId: String(i.product._id || i.product), qty: i.qty }));
-          useCart.getState().setItems(mapped);
-        }
-      } catch (e) {
-        // ignore merge errors
-      }
-      toast.success('Signed in successfully');
+    console.log('Auth State: login response', data);
+    if (!data?.accessToken) {
+      throw new Error('Authentication failed: missing access token');
     }
+
+    // persist tokens
+    localStorage.setItem('accessToken', data.accessToken);
+    if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+    setAuthHeader(data.accessToken);
+
+    // fetch user profile
+    let userProfile = null;
+    try {
+      const me = await apiAuth.me();
+      if (me?.data) {
+        userProfile = me.data;
+      } else {
+        throw new Error('Unable to load profile after login');
+      }
+    } catch (e) {
+      console.error('Auth State: login me() failed', e);
+      clearAuthTokens();
+      setAuthHeader(null);
+      set({ token: null, refreshToken: null, user: null, isAuthenticated: false });
+      throw e;
+    }
+
+    set({ token: data.accessToken, refreshToken: data.refreshToken, user: userProfile, isAuthenticated: true });
+
+    // merge local guest cart into user's cart
+    try {
+      const guest = useCart.getState().items;
+      for (const it of guest) {
+        await apiCart.add(it.productId, it.qty);
+      }
+      // refresh server cart into local state
+      const serverCart = await apiCart.get();
+      if (serverCart?.data?.items) {
+        const mapped = serverCart.data.items.map((i: any) => ({ productId: String(i.product._id || i.product), qty: i.qty }));
+        useCart.getState().setItems(mapped);
+      }
+    } catch (e) {
+      console.warn('Auth State: cart merge failed', e);
+    }
+
+    toast.success('Signed in successfully');
     return res;
   },
   logout: () => {
@@ -94,18 +112,22 @@ export const useAuth = create<State>((set) => ({
   const access = localStorage.getItem('accessToken');
   const refresh = localStorage.getItem('refreshToken');
   if (!access && !refresh) {
+    console.log('Auth State: restore empty');
     useAuth.setState({ loading: false });
     return;
   }
+  console.log('Auth State: restore starting', { accessPresent: !!access, refreshPresent: !!refresh });
   if (access) {
     setAuthHeader(access);
     try {
       const me = await apiAuth.me();
       if (me?.data) {
+        console.log('Auth State: restore success', me.data);
         useAuth.setState({ token: access, refreshToken: refresh, user: me.data, isAuthenticated: true, loading: false });
         return;
       }
     } catch (e) {
+      console.warn('Auth State: restore me() failed', e);
       // try refresh
     }
   }
@@ -114,15 +136,19 @@ export const useAuth = create<State>((set) => ({
       const r = await apiAuth.refresh(refresh);
       const newAccess = r?.accessToken;
       const newRefresh = r?.refreshToken;
+      console.log('Auth State: refresh result', r);
       if (newAccess) {
         localStorage.setItem('accessToken', newAccess);
         if (newRefresh) localStorage.setItem('refreshToken', newRefresh);
         setAuthHeader(newAccess);
         const me = await apiAuth.me();
-        useAuth.setState({ token: newAccess, refreshToken: newRefresh, user: me?.data || null, isAuthenticated: !!me?.data, loading: false });
-        return;
+        if (me?.data) {
+          useAuth.setState({ token: newAccess, refreshToken: newRefresh, user: me.data, isAuthenticated: true, loading: false });
+          return;
+        }
       }
     } catch (e) {
+      console.warn('Auth State: refresh failed', e);
       // fallthrough
     }
   }

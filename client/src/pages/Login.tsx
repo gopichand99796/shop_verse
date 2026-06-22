@@ -15,12 +15,14 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const login = useAuth((s) => s.login);
+  const authState = useAuth((s) => ({ user: s.user, isAuthenticated: s.isAuthenticated }));
   const nav = useNavigate();
 
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    console.log('Login page auth state before submit:', authState);
     const promise = login(email, password);
     toast.promise(
       promise,
@@ -37,6 +39,7 @@ export default function Login() {
 
     try {
       await promise;
+      console.log('Login page auth state after submit:', { user: authState.user, isAuthenticated: authState.isAuthenticated });
       nav('/');
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Login failed. Please try again.');

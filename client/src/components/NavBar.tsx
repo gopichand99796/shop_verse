@@ -11,6 +11,7 @@ export default function NavBar() {
   const user = useAuth((s) => s.user);
   const isAuthenticated = useAuth((s) => s.isAuthenticated);
   const logout = useAuth((s) => s.logout);
+  console.log('Navbar Auth State:', { user, isAuthenticated });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const nav = useNavigate();
 
@@ -75,11 +76,11 @@ export default function NavBar() {
                 {cartCount}
               </span>
             </Link>
-            {user ? (
+            {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <Link to="/profile" className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-neutral-100 transition-colors">
                   <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-medium">{(user?.name || 'U').charAt(0).toUpperCase()}</div>
-                  <span className="text-neutral-700">{user?.name}</span>
+                  <span className="text-neutral-700">{user?.name || 'Account'}</span>
                 </Link>
                 <button onClick={() => { logout(); nav('/'); }} className="p-2 rounded-xl hover:bg-neutral-100 transition-colors text-neutral-600">
                   <LogOut className="h-5 w-5" />

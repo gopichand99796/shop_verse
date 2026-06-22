@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { User } from '../models/User';
+import { Order } from '../models/Order';
 import { RefreshToken } from '../models/RefreshToken';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { Types } from 'mongoose';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -79,6 +81,33 @@ router.post('/logout', async (req, res) => {
 		if (!refreshToken) return res.status(400).json({ message: 'Missing token' });
 		await RefreshToken.deleteOne({ token: refreshToken });
 		return res.json({ success: true });
+	} catch (err) {
+		return res.status(500).json({ message: 'Server error' });
+	}
+});
+
+router.get('/me', requireAuth, async (req: any, res) => {
+	try {
+		const userId = req.user?.id;
+		if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+		const user = await User.findById(userId).select('name email role createdAt addresses wishlist');
+		if (!user) return res.status(404).json({ message: 'User not found' });
+		const ordersCount = await Order.countDocuments({ user: userId });
+		const activeOrdersCount = await Order.countDocuments({ user: userId, orderStatus: { $in: ['placed', 'confirmed', 'shipped'] } });
+		return res.json({
+			success: true,
+			data: {
+				id: user._id,
+				name: user.name,
+				email: user.email,
+				role: user.role,
+				joined: user.createdAt,
+				addresses: user.addresses || [],
+				wishlistCount: (user.wishlist || []).length,
+				ordersCount,
+				pendingOrders: activeOrdersCount,
+			},
+		});
 	} catch (err) {
 		return res.status(500).json({ message: 'Server error' });
 	}

@@ -12,7 +12,6 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
-export const fallbackProductImage = '/products/fallback.png';
 
 export function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat('en-US', {

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Trash2, ShoppingBag, Plus, Minus, ArrowRight, Truck, Shield } from 'lucide-react';
 import { useState } from 'react';
 import { formatPrice } from '../lib/utils';
-import { getProductImage, fallbackProductImage } from '../lib/productImages';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -95,17 +94,17 @@ export default function CartPage() {
                 >
                   <Card className="p-6">
                     <div className="flex gap-6">
-                      <div className="w-24 h-24 bg-neutral-100 rounded-xl overflow-hidden flex-shrink-0">
-                        <img
-                          src={getProductImage(item.product)}
-                          alt={item.product.name}
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = fallbackProductImage;
-                          }}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-24 h-24 bg-neutral-100 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-neutral-500">
+                        {item.product.images?.[0] ? (
+                          <img
+                            src={item.product.images[0]}
+                            alt={item.product.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="text-xs text-center">No Image</div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link to={`/products/${item.product._id}`} className="font-semibold text-neutral-900 hover:text-primary-600 transition-colors line-clamp-2">

@@ -21,6 +21,6 @@ export const imageMap: Record<string, string> = {
   "Mystery Novel Collection": "/products/Gemini_Generated_Image_4c03354c03354c03-20.png"
 };
 
-export function getProductImage(product: any): string {
-  return imageMap[product?.name] || product?.images?.[0] || '/products/fallback.png';
+export function getProductImage(product: any): string | undefined {
+  return imageMap[product?.name] || product?.images?.[0];
 }

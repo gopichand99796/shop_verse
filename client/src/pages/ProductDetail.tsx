@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, Clock, ChevronLeft, Check, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { formatPrice } from '../lib/utils';
-import { getProductImage, fallbackProductImage } from '../lib/productImages';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -95,16 +94,16 @@ export default function ProductDetail() {
           <div className="space-y-4">
             <Card className="overflow-hidden">
               <div className="aspect-square bg-neutral-100">
-                <img
-                  src={getProductImage(product)}
-                  alt={product.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = fallbackProductImage;
-                  }}
-                  className="w-full h-full object-cover"
-                />
+                {product.images?.[0] ? (
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-sm text-neutral-500">No Image</div>
+                )}
               </div>
             </Card>
             {product.images && product.images.length > 1 && (
@@ -117,16 +116,16 @@ export default function ProductDetail() {
                       selectedImage === index ? 'border-primary-500' : 'border-transparent hover:border-neutral-300'
                     }`}
                   >
-                    <img
-                      src={image || fallbackProductImage}
-                      alt={`${product.name} ${index + 1}`}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = fallbackProductImage;
-                      }}
-                      className="w-full h-full object-cover"
-                    />
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={`${product.name} ${index + 1}`}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-sm text-neutral-500">No Image</div>
+                    )}
                   </button>
                 ))}
               </div>

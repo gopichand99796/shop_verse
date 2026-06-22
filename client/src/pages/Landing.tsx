@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Star, Truck, Shield, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { formatPrice } from '../lib/utils';
-import { getProductImage, fallbackProductImage } from '../lib/productImages';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
@@ -217,17 +216,17 @@ export default function Landing() {
                   <Link to={`/products/${product._id}`}>
                     <Card className="group h-full hover:shadow-medium transition-all duration-300 cursor-pointer overflow-hidden">
                       <div className="relative">
-                        <div className="aspect-square bg-neutral-100 overflow-hidden">
-                          <img
-                            src={getProductImage(product)}
-                            alt={product.name}
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = fallbackProductImage;
-                            }}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
+                        <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
+                          {product.images?.[0] ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="text-sm">No Image</div>
+                          )}
                         </div>
                         {product.discountPrice && product.discountPrice < product.price && (
                           <div className="absolute top-3 left-3 bg-accent-500 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -330,17 +329,17 @@ export default function Landing() {
                   <Link to={`/products/${product._id}`}>
                     <Card className="group h-full hover:shadow-medium transition-all duration-300 cursor-pointer overflow-hidden">
                       <div className="relative">
-                        <div className="aspect-square bg-neutral-100 overflow-hidden">
-                          <img
-                            src={getProductImage(product)}
-                            alt={product.name}
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = fallbackProductImage;
-                            }}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
+                        <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
+                          {product.images?.[0] ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="text-sm">No Image</div>
+                          )}
                         </div>
                         <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                           New

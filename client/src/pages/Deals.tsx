@@ -6,7 +6,6 @@ import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
 import Button from '../components/ui/Button';
 import { formatPrice } from '../lib/utils';
-import { getProductImage, fallbackProductImage } from '../lib/productImages';
 
 export default function Deals() {
   const featuredQuery = useQuery({ queryKey: ['featuredProducts'], queryFn: () => products.featured(), });
@@ -66,17 +65,17 @@ export default function Deals() {
               <motion.div key={product._id} whileHover={{ y: -4 }} className="group">
                 <Link to={`/products/${product._id}`}>
                   <Card className="overflow-hidden h-full">
-                    <div className="aspect-square bg-neutral-100 overflow-hidden">
-                      <img
-                        src={getProductImage(product)}
-                        alt={product.name}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = fallbackProductImage;
-                        }}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
+                    <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="text-sm">No Image</div>
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-neutral-900 mb-2">{product.name}</h3>
@@ -113,17 +112,17 @@ export default function Deals() {
               <motion.div key={product._id} whileHover={{ y: -4 }} className="group">
                 <Link to={`/products/${product._id}`}>
                   <Card className="overflow-hidden h-full">
-                    <div className="aspect-square bg-neutral-100 overflow-hidden">
-                      <img
-                        src={getProductImage(product)}
-                        alt={product.name}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = fallbackProductImage;
-                        }}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
+                    <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="text-sm">No Image</div>
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-neutral-900 mb-2">{product.name}</h3>
@@ -160,17 +159,17 @@ export default function Deals() {
               <motion.div key={product._id} whileHover={{ y: -4 }} className="group">
                 <Link to={`/products/${product._id}`}>
                   <Card className="overflow-hidden h-full">
-                    <div className="aspect-square bg-neutral-100 overflow-hidden">
-                      <img
-                        src={getProductImage(product)}
-                        alt={product.name}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = fallbackProductImage;
-                        }}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
+                    <div className="aspect-square bg-neutral-100 overflow-hidden flex items-center justify-center text-neutral-500">
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="text-sm">No Image</div>
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-neutral-900 mb-2">{product.name}</h3>

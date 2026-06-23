@@ -4,7 +4,7 @@
   "framework": "vite",
   "env": {
     "VITE_API_URL": {
-      "description": "Backend API URL"
+      "description": "https://shop-verse-3.onrender.com"
     }
   }
 }
